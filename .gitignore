@@ -4,7 +4,7 @@
 *.tmp
 *.Rdata
 
-Data/Data_raw/*
+data/data_raw/*
 
 # SS3 specific files
 *admodel.cov
