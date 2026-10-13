@@ -1,0 +1,6 @@
+Note 1 Information: Max data length bin: 76  < max pop len bins: 80; so will accumulate larger pop len bins
+Warning 1 : Setting in starter does not request all priors, and 3 parameters have priors and are not estimated, so their prior not included in obj_fun.
+Warning 2 : Minimum pop size bin:_4; is > L at Amin for sex: 1; Gpat: 1; L= 0
+Warning 3 : Minimum pop size bin:_4; is > L at Amin for sex: 2; Gpat: 1; L= 2.96191
+Note 2 Information: A revised protocol for the Fcast_yr specification is available and recommended.
+ 3 warnings  and 2 notes 
