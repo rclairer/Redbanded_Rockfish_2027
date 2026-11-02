@@ -60,6 +60,7 @@ params:
    spp_latin: 'Sebastes babcocki'
    region: 'U.S. West Coast'
 bibliography:  
+  - bibliography_files/asar_references.bib
   - bibliography_files/aquaculture.bib
   - bibliography_files/asar_citation.bib
   - bibliography_files/canjfishaquatsci.bib
