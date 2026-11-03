@@ -76,8 +76,8 @@ fit <- run_sdmtmb(
   n_knots = my_data$knots,
   share_range = TRUE, #my_data$share_range,
   anisotropy = my_data$anisotropy,
-  spatiotemporal = list("off", "iid"), #list("off", "off"), #changed this from "off", "iid" to try to get a converging model
-  dir = here::here("data/data_processed/survey_indices/wcgbts_rerun_2")
+  spatiotemporal = list("iid", "iid"), #list("off", "off"), #changed this from "off", "iid" to try to get a converging model
+  dir = here::here("data/data_processed/survey_indices/wcgbts_rerun_3")
 )
 ```
 
@@ -95,7 +95,7 @@ A range of diagnostics are available and all diagnostics can be done using `diag
 ```{r diagnostics, eval = FALSE, echo = TRUE}
 diag <- diagnose(
   fit = fit,
-  dir = here::here("data/data_processed/survey_indices/wcgbts_rerun_2")
+  dir = here::here("data/data_processed/survey_indices/wcgbts_rerun_3")
 )
 ```
 
@@ -112,7 +112,7 @@ index <- calc_index_areas(
   data = fit$data,
   fit = fit,
   boundaries = "Coastwide",
-  dir = here::here("data/data_processed/survey_indices/wcgbts_rerun_2")
+  dir = here::here("data/data_processed/survey_indices/wcgbts_rerun_3")
 )
 ```
 
