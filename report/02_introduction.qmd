@@ -1,12 +1,17 @@
 # Introduction {#sec-intro}
 
-Testing adding in an introduction for `r params$species`. There is currently no read of parameters for child documents.
+This assessment report describes the stock of `r params$spp_latin` (known colloquially as the `r params$species`) coastwide from California to Washington within state and federal waters, using data through 2026 (Figure: Distribution Map). `r params$species` also goes by . This assessment does not account for populations located in other areas north of the contiguous U.S. border with Canada, nor in Alaska. This is the first benchmark stock assessment for this species in support of decision-making at the Pacific Fishery Management Council. 
 
-<!-- The intent is to keep this section to 2-3 pages and provide a high-level summary of the assessment findings. The intention is to provide enough information in this section so the audience does not need to reference previous documents. Please include the species scientific name at the first mention of its common name. -->
+## Distsribution and Stock Structure {#sec-stock-id}
 
-## Stock ID {#sec-stock-id}
+`r params$species` is has been observed from southern California up through the Gulf of Alaska and the Aleutian Islands. WE NEED TO GET A DENSITY MAP OF DISTRIBUTION TO SHOW CORE DISTRIBUTION. `r params$species` are generally a deep shelf to slope species that shows affinity to rocks, boulders and caves, but also are found on mixed muddy and hardbottom seafloors. Hyde and Vetter [-@hydeOriginEvolutionDiversification2007] presented a genetic analyses of the genus *Sebastes* and show `r params$species`being most related to Tiger (*S. nigrocintus*), Flag (*S. rubrivinctus*, which translates to "red-banded"), and Treefish (*S. serriceps*) Rockfishes. Treefish is more southerly and generally shallower oriented 
 
-<!-- Provide a detailed description of the stock, if appropriate, as well as quantitative studies or data behind the decision-making process. -->
+## Distibution
+
+
+
+## Life History 
+
 
 
 ## Management History {#sec-management-history}
