@@ -1,3 +1,15 @@
 # Discussion {#sec-discussion}
 
 <!--- The discussion is dependent on analyst/assessment/region. Include subsections discussing ecosystem considerations (if applicable) and research recommendations/improvements to the assessment. --->
+
+## Unresolved Problems and Major Uncertainties {#sec-problems-uncertainties}
+
+## Harvest Projections and Decision Tables {#sec-projections-decision}
+
+## Risk Table (#sec-risk-table)
+
+## Evaluation of Scientific Uncertainty (#sec-sci-uncertainty)
+
+## Regional Management Considerations (#sec-management-considerations)
+
+## Research and Data Needs (#sec-reserach-needs)
