@@ -23,7 +23,7 @@ inputs$dat$N_areas #number of areas is 1, coastwide
 
 inputs$dat$styr #????
 
-inputs$dat$endyr #????
+inputs$dat$endyr <- 2026 #is this correct? the end year for data, right?
 
 #########################################
 ### HISTORICAL CATCH
@@ -38,6 +38,8 @@ inputs$dat$catch
 #NONTWL
 #MID
 
+
+
 #########################################
 ### CONTEMPORARY CATCH
 #########################################
@@ -50,6 +52,8 @@ inputs$dat$catch
 #TWL
 #NONTWL
 #MID
+
+colnames_c <- c("year", "seas", "fleet", "catch", "catch_se")
 
 #########################################
 ### INDICES
@@ -118,6 +122,27 @@ inputs$dat$len_info #CHANGE THIS
 inputs$dat$lencomp
 
 #Triennial - fleet 1
+
+#WCGBTS - fleet 2
+
+#########################################
+### COMMERCIAL AGECOMP
+#########################################
+
+inputs$dat$age_info #CHANGE THIS
+
+inputs$dat$agecomp
+
+#no rec????
+
+#########################################
+### SURVEY AGECOMP
+#########################################
+#???? Nsamp method used for all survey maal is the old Stewart Hamel method from the 2017 assessment where
+#???? Nsamp = n_trips + 0.0707 * n_fish when n_fish/n_tows < 55 and
+#???? Nsamp = 4.89 * n_trips when n_fish/n_tows >= 55
+
+#no Triennial
 
 #WCGBTS - fleet 2
 
