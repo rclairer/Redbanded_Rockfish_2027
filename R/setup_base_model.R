@@ -29,23 +29,6 @@ inputs$dat$endyr <- 2026 #is this correct? the end year for data, right?
 ### HISTORICAL CATCH
 #########################################
 
-#no catch info?
-
-inputs$dat$catch
-
-#fleets (all commercial, no rec...?)?
-#TWL
-#NONTWL
-#MID
-
-
-
-#########################################
-### CONTEMPORARY CATCH
-#########################################
-
-#no catch info?
-
 inputs$dat$catch
 
 #fleets (all commercial, no rec...?)?
@@ -54,6 +37,36 @@ inputs$dat$catch
 #MID
 
 colnames_c <- c("year", "seas", "fleet", "catch", "catch_se")
+
+CA_com_catch_reconstruction <- read.csv(here::here("data/data_processed/com_catch_reconstructions/CA_catch_reconstruction.csv"))
+#years 1916 to 1980
+#might have to proportion into separate fleets
+CA_catch_historic <- CA_com_catch_reconstruction |>
+  dplyr::select(Year, MT) |>
+  dplyr::mutate(seas = 1,
+                fleet = 1,
+                se = 0.01)|> #is 0.01 standard? 
+  dplyr::select(Year, seas, fleet, MT, se)
+#Add start line?
+# start_line <- data.frame(
+#   year = -999,
+#   seas = 1,
+#   fleet = 1,
+#   catch = 0,
+#   catch_se = 0.01
+# )
+colnames(CA_catch_historic) <- colnames_c
+  
+#########################################
+### CONTEMPORARY CATCH
+#########################################
+
+inputs$dat$catch
+
+#fleets (all commercial, no rec...?)?
+#TWL
+#NONTWL
+#MID
 
 #########################################
 ### INDICES
