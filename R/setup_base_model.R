@@ -8,11 +8,11 @@ model_dir <- here::here("models/base_placeholder")
 
 # Copy the template files directly from the package sample data
 # 'simple_small' or basic templates provide a clean starting point
-r4ss::copy_SS_inputs(
-  dir.old = system.file("extdata", "simple_small", package = "r4ss"),
-  dir.new = model_dir,
-  overwrite = TRUE
-)
+#r4ss::copy_SS_inputs(
+#  dir.old = system.file("extdata", "simple_small", package = "r4ss"),
+#  dir.new = model_dir,
+#  overwrite = TRUE
+#)
 
 head(inputs$dat)
 
@@ -24,6 +24,13 @@ inputs$dat$N_areas #number of areas is 1, coastwide
 inputs$dat$styr #????
 
 inputs$dat$endyr <- 2026 #is this correct? the end year for data, right?
+
+inputs$dat$Nfleets <- 5 #TWL, NONTWL, MID, TRI, WCGBTS
+inputs$dat$fleetnames <- c("TWL", "NONTWL", "MID", "TRI", "WCGBTS")
+
+inputs$dat$fleetinfo #?????
+inputs$dat$fleetinfo1 #?????
+inputs$dat$fleetinfo2 #??????
 
 #########################################
 ### HISTORICAL CATCH
@@ -95,25 +102,25 @@ inputs$dat$CPUE
 
 colnames_i <- c("year", "month", "index", "obs", "se_log")
 
-#Triennial survey - fleet 1
+#Triennial survey - fleet 4
 #placeholder, probably will update with a covariate for timing
 triennial_combined <- read.csv(here::here("data/data_processed/survey_indices/triennial/lat_34.5-48.5_years_1980-2004_combined/delta_gamma/index/est_by_area.csv"))
 triennial_combined_index <- triennial_combined |>
   dplyr::select(year, est, se) |>
   dplyr::mutate(month = 7, #why do I need month?
-                fleet = 1) |>
+                fleet = 4) |>
   dplyr::select(year, month, fleet, est, se)
 
 colnames(triennial_combined_index) <- colnames_i
 
-#WCGBTS - fleet 2
+#WCGBTS - fleet 5
 
 wcgbts_coastwide <- read.csv(here::here("data/data_processed/survey_indices/wcgbts_rerun/redbanded_rockfish/wcgbts/lat_33.5-48.5_years_2003-2025/delta_gengamma/index/est_by_area.csv"))
 
 wcgbts_coastwide_index <- wcgbts_coastwide |>
   dplyr::select(year, est, se) |>
   dplyr::mutate(month = 7, #why do I need month?
-                fleet = 2) |>
+                fleet = 5) |>
   dplyr::select(year, month, fleet, est, se)
 
 colnames(wcgbts_coastwide_index) <- colnames_i
@@ -151,9 +158,9 @@ inputs$dat$len_info #CHANGE THIS
 
 inputs$dat$lencomp
 
-#Triennial - fleet 1
+#Triennial - fleet 4
 
-#WCGBTS - fleet 2
+#WCGBTS - fleet 5
 
 #########################################
 ### COMMERCIAL AGECOMP
@@ -174,6 +181,7 @@ inputs$dat$agecomp
 
 #no Triennial
 
-#WCGBTS - fleet 2
+#WCGBTS - fleet 5
 
+r4ss::SS_write(inputs, dir = model_dir, overwrite = TRUE)
 
