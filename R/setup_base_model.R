@@ -32,21 +32,21 @@ inputs$dat$endyr <- 2026 #is this correct? the end year for data, right?
 inputs$dat$catch
 
 #fleets (all commercial, no rec...?)?
-#TWL
-#NONTWL
+#TWL - fleet 1
+#NONTWL - fleet 2
 #MID
 
 colnames_c <- c("year", "seas", "fleet", "catch", "catch_se")
 
 CA_com_catch_reconstruction <- read.csv(here::here("data/data_processed/com_catch_reconstructions/CA_catch_reconstruction.csv"))
 #years 1916 to 1980
-#might have to proportion into separate fleets
-CA_catch_historic <- CA_com_catch_reconstruction |>
-  dplyr::select(Year, MT) |>
+#proportion into separate fleets, what to do with UNK????
+CA_com_catch_historic_TWL <- CA_com_catch_reconstruction |>
+  dplyr::select(Year, TWL_mt) |>
   dplyr::mutate(seas = 1,
                 fleet = 1,
                 se = 0.01)|> #is 0.01 standard? 
-  dplyr::select(Year, seas, fleet, MT, se)
+  dplyr::select(Year, seas, fleet, TWL_mt, se)
 #Add start line?
 # start_line <- data.frame(
 #   year = -999,
@@ -55,7 +55,24 @@ CA_catch_historic <- CA_com_catch_reconstruction |>
 #   catch = 0,
 #   catch_se = 0.01
 # )
-colnames(CA_catch_historic) <- colnames_c
+colnames(CA_com_catch_historic_TWL) <- colnames_c
+
+CA_com_catch_historic_NONTWL <- CA_com_catch_reconstruction |>
+  dplyr::select(Year, NONTWL_mt) |>
+  dplyr::mutate(seas = 1,
+                fleet = 2,
+                se = 0.01)|> #is 0.01 standard? 
+  dplyr::select(Year, seas, fleet, NONTWL_mt, se)
+#Add start line?
+# start_line <- data.frame(
+#   year = -999,
+#   seas = 1,
+#   fleet = 2,
+#   catch = 0,
+#   catch_se = 0.01
+# )
+colnames(CA_com_catch_historic_NONTWL) <- colnames_c
+
   
 #########################################
 ### CONTEMPORARY CATCH
