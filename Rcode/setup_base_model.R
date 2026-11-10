@@ -47,7 +47,10 @@ colnames_c <- c("year", "seas", "fleet", "catch", "catch_se")
 
 CA_com_catch_reconstruction <- read.csv(here::here("data/data_processed/com_catch_reconstructions/CA_catch_reconstruction.csv"))
 #years 1916 to 1980
+#fleets: OTHER (NONTRAWL), TWL, and UNKNOWN
+######################################################
 #proportion into separate fleets, what to do with UNK????
+##########################################################
 CA_com_catch_historic_TWL <- CA_com_catch_reconstruction |>
   dplyr::select(Year, TWL_mt) |>
   dplyr::mutate(seas = 1,
@@ -79,6 +82,43 @@ CA_com_catch_historic_NONTWL <- CA_com_catch_reconstruction |>
 #   catch_se = 0.01
 # )
 colnames(CA_com_catch_historic_NONTWL) <- colnames_c
+
+WA_com_catch_reconstruction <- read.csv(here::here("data/data_processed/com_catch_reconstructions/WA_catch_reconstruction.csv"))
+#years 1908 to 2000
+#for now, use reconstruction through 1992 (until 1993, data existing PacFIN-PacFin_FT match and make sense to WA state data reps, after 1993, the data do not align - probably because how redbanded are propotioned in catch?)
+#fleets: HKL, TWL, POT. There is no POT catch, but if there was, would combine with HKL
+######################################################
+WA_com_catch_historic_TWL <- WA_com_catch_reconstruction |>
+  dplyr::select(Year, TWL_mt) |>
+  dplyr::mutate(seas = 1,
+                fleet = 1,
+                se = 0.01)|> #is 0.01 standard? 
+  dplyr::select(Year, seas, fleet, TWL_mt, se)
+#Add start line?
+# start_line <- data.frame(
+#   year = -999,
+#   seas = 1,
+#   fleet = 1,
+#   catch = 0,
+#   catch_se = 0.01
+# )
+colnames(WA_com_catch_historic_TWL) <- colnames_c
+
+WA_com_catch_historic_NONTWL <- WA_com_catch_reconstruction |>
+  dplyr::select(Year, HKL_mt) |>
+  dplyr::mutate(seas = 1,
+                fleet = 2,
+                se = 0.01)|> #is 0.01 standard? 
+  dplyr::select(Year, seas, fleet, HKL_mt, se)
+#Add start line?
+# start_line <- data.frame(
+#   year = -999,
+#   seas = 1,
+#   fleet = 2,
+#   catch = 0,
+#   catch_se = 0.01
+# )
+colnames(WA_com_catch_historic_NONTWL) <- colnames_c
 
   
 #########################################
