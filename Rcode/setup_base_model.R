@@ -14,9 +14,9 @@ model_dir <- here::here("models/base_placeholder")
 #  overwrite = TRUE
 #)
 
-head(inputs$dat)
 
 inputs <- r4ss::SS_read(dir = model_dir)
+head(inputs$dat)
 inputs$dat$Nsexes #number of sexes is 2, because of differences in growth curves and weight at age
 
 inputs$dat$N_areas #number of areas is 1, coastwide
@@ -93,6 +93,7 @@ WA_com_catch_historic_TWL <- WA_com_catch_reconstruction |>
   dplyr::mutate(seas = 1,
                 fleet = 1,
                 se = 0.01)|> #is 0.01 standard? 
+  dplyr::filter(Year < 1993) |> #unresolved issue with data past 1992
   dplyr::select(Year, seas, fleet, TWL_mt, se)
 #Add start line?
 # start_line <- data.frame(
@@ -108,8 +109,9 @@ WA_com_catch_historic_NONTWL <- WA_com_catch_reconstruction |>
   dplyr::select(Year, HKL_mt) |>
   dplyr::mutate(seas = 1,
                 fleet = 2,
-                se = 0.01)|> #is 0.01 standard? 
-  dplyr::select(Year, seas, fleet, HKL_mt, se)
+                se = 0.01)|> #is 0.01 standard?
+  dplyr::filter(Year < 1993) |> #unresolved issue with data past 1992
+    dplyr::select(Year, seas, fleet, HKL_mt, se)
 #Add start line?
 # start_line <- data.frame(
 #   year = -999,
@@ -120,7 +122,6 @@ WA_com_catch_historic_NONTWL <- WA_com_catch_reconstruction |>
 # )
 colnames(WA_com_catch_historic_NONTWL) <- colnames_c
 
-  
 #########################################
 ### CONTEMPORARY CATCH
 #########################################
@@ -131,6 +132,19 @@ inputs$dat$catch
 #TWL
 #NONTWL
 #MID
+
+
+# Combine all catch data
+all_catch <- do.call(
+  "rbind",
+  list(
+    TWL,
+    NONTWL,
+    MID
+  )
+)
+
+
 
 #########################################
 ### INDICES

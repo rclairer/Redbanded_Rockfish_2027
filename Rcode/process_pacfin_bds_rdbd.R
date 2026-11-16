@@ -4,7 +4,7 @@ library(nwfscSurvey)
 library(r4ss)
 
 load(here::here("data/data_raw/PacFIN.RDBD.bds.14.Aug.2026.RData")) 
-load(here::here("data/data_raw/PacFIN.RDBD.CompFT.14.Aug.2026.RData")) 
+#load(here::here("data/data_raw/PacFIN.RDBD.CompFT.14.Aug.2026.RData")) 
 
 #ss_data <- SS_readdat(file="../../model/2017_yelloweye_model_updated_ss3_exe/yelloweye_data.ss")
 
