@@ -6,9 +6,7 @@ library(r4ss)
 load(here::here("data/data_raw/PacFIN.RDBD.bds.14.Aug.2026.RData")) 
 #load(here::here("data/data_raw/PacFIN.RDBD.CompFT.14.Aug.2026.RData")) 
 
-#ss_data <- SS_readdat(file="../../model/2017_yelloweye_model_updated_ss3_exe/yelloweye_data.ss")
-
-#path for storing
+#path for saving
 save_dir = here::here("data/data_processed/com_length_age_comps")
 
 #Bins for biological data
@@ -42,10 +40,90 @@ bds_cleaned_full <- pacfintools::cleanPacFIN(
   keep_sample_method = good_methods,
   keep_age_method = good_age_method,
   clean = FALSE
-)#|>
-#mutate(geargroup = ifelse(geargroup!='TWL','NONTWL',geargroup)) 
+)
 
 
+#remove NET, TLS, and TWS
+bds_cleaned <- bds_cleaned %>%
+  dplyr::filter(geargroup != "NET") %>%
+  dplyr::filter(geargroup != "TLS") %>%
+  dplyr::filter(geargroup != "TWS") %>%
+  mutate(fleet=replace_when(fleet, geargroup=="HKL" ~ "NONTWL"))%>%
+  mutate(fleet=replace_when(fleet, geargroup=="POT" ~ "NONTWL"))
+
+
+#add sex column
+bds_cleaned <- bds_cleaned %>%
+  dplyr::mutate(sex = SEX_CODE)
+
+##############################################################
+################ RAW LENGTH COMP 
+###############################################################
+#TRAWL
+TWL_length_comps_total_samples <- get_raw_comps(data= bds_cleaned,
+                                      fleet = "TWL",
+                                      comp_bins = length_bins,
+                                      comp_column_name = "lengthcm",
+                                      dir = NULL,
+                                      input_n_method="total_samples",
+                                      two_sex_comps = TRUE,
+                                      month = 7)
+
+TWL_length_comps_total_samples <- TWL_length_comps_out$sexed
+
+#NONTWL
+NONTWL_length_comps_total_samples <- get_raw_comps(data= bds_cleaned,
+                                      fleet = "NONTWL",
+                                      comp_bins = length_bins,
+                                      comp_column_name = "lengthcm",
+                                      dir = NULL,
+                                      input_n_method="total_samples",
+                                      two_sex_comps = TRUE,
+                                      month = 7)
+
+NONTWL_length_comps_total_samples <- NONTWL_length_comps_out$sexed
+
+#MID
+MID_length_comps_total_samples <- get_raw_comps(data= bds_cleaned,
+                                         fleet = "MID",
+                                         comp_bins = length_bins,
+                                         comp_column_name = "lengthcm",
+                                         dir = NULL,
+                                         input_n_method="total_samples",
+                                         two_sex_comps = TRUE,
+                                         month = 7)
+
+MID_length_comps_total_samples <- MID_length_comps_out$sexed
+
+raw_length_comps_total_samples <- rbind(TWL_length_comps_total_samples, NONTWL_length_comps_total_samples, MID_length_comps_total_samples)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+################################################
 
 nrow(bds.pacfin);nrow(bds_cleaned)
 ncol(bds.pacfin);ncol(bds_cleaned)
@@ -54,6 +132,11 @@ names(bds_cleaned)
 bds_cleaned %>% 
   group_by(geargroup) %>% 
   summarise(n=length(geargroup))
+
+bds_cleaned %>% 
+  group_by(fleet) %>% 
+  summarise(n=length(fleet))
+#geargroup and fleet are the same
 
 bds_cleaned %>% 
   group_by(geargroup,PACFIN_GEAR_NAME) %>% 
@@ -139,9 +222,17 @@ plotCleaned(bds_cleaned,savedir = save_dir)
 #SAMPLE_NUMBER = sample number (sometime a tow sometime not)
 #FTID = a fish ticket = proxy of a trip
 
+#remove NET, TLS, and TWS
+bds_cleaned <- bds_cleaned %>%
+  dplyr::filter(geargroup != "NET") %>%
+  dplyr::filter(geargroup != "TLS") %>%
+  dplyr::filter(geargroup != "TWS") %>%
+  mutate(fleet=replace_when(fleet, geargroup=="HKL" ~ "NONTWL"))%>%
+  mutate(fleet=replace_when(fleet, geargroup=="POT" ~ "NONTWL"))
+
 fleets_names <- tibble(
   fleet_name=c(levels(as.factor(bds_cleaned$fleet))),
-  fleet_number=c(1,2,3,4,5,6,7))
+  fleet_number=c(3,2,1))
 
 #LENGTH SAMPLING EFFORT
 
@@ -161,12 +252,9 @@ length_sample_effort_wide <- length_sample_effort %>%
               values_from = c(n_trips,n_fish),
               names_glue="{fleet}_{.value}") %>% 
   relocate(year,TWL_n_trips,TWL_n_fish,
-            HKL_n_trips, HKL_n_fish,
-           MID_n_trips, MID_n_fish,
-           NET_n_trips, NET_n_fish,
-           TLS_n_trips, TLS_n_fish,
-           TWS_n_trips, TWS_n_fish,
-           POT_n_trips, POT_n_fish) #%>% 
+            TWL_n_trips, TWL_n_fish,
+           NONTWL_n_trips, NONTWL_n_fish,
+           MID_n_trips, MID_n_fish) #%>% 
 
 #write.csv(length_sample_effort_wide,row.names = FALSE,
 #          file =paste0(save_dir,"com_length_sampling_effort.csv"))
@@ -237,3 +325,36 @@ ggsave(age_sample_effort_plt,filename=
          paste0(save_dir,"/com_age_sampling_effort.png"),
        width=8,height = 5)
 
+##########################################################
+
+tmp_length_comps_out <- get_raw_comps(data=bds_cleaned,
+                                      fleet = "TWL",
+                                      comp_bins = length_bins,
+                                      comp_column_name = "Length_cm",
+                                      dir = NULL,
+                                      input_n_method="total_samples",
+                                      two_sex_comps = TRUE)
+
+
+raw_length_comps <-NULL
+
+# looping over every fleet
+for (f in 1:nrow(fleets_names)){
+  tmp_dat <- bds_cleaned %>% filter(!is.na(lengthcm),fleet==as.character(fleets_names[f,1])) %>% 
+    mutate(common_name='redbanded rockfish',total_samples=1,project='A')
+  
+  tmp_length_comps_out <- get_raw_comps(data=tmp_dat,
+                                        comp_bins = length_bins,
+                                        comp_column_name = "Length_cm",
+                                        dir = NULL,
+                                        input_n_method="total_samples", 
+                                        fleet = fleets_names[f,2],
+                                        two_sex_comps = TRUE)
+  
+  tmp_length_comps <- tmp_length_comps_out$unsexed 
+  tmp_length_comps <- 
+  #combine to make a df w all fleets
+  raw_length_comps <- raw_length_comps %>% bind_rows(tmp_length_comps)
+}
+
+# raw_length_comps %>% summary()
