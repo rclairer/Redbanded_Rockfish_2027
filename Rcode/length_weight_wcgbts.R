@@ -12,6 +12,8 @@ pars <- nwfscSurvey::estimate_weight_length(
   verbose = FALSE
 )
 
+save(pars, file = here::here("data/data_processed/survey_length_weight/length_weight_parameters.rda"))
+
 plot_weight_length(
   bds_survey,
   dir = here::here("data/data_processed/survey_length_weight"),

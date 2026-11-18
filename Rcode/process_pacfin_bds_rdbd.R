@@ -4,7 +4,7 @@ library(nwfscSurvey)
 library(r4ss)
 
 load(here::here("data/data_raw/PacFIN.RDBD.bds.14.Aug.2026.RData")) 
-#load(here::here("data/data_raw/PacFIN.RDBD.CompFT.14.Aug.2026.RData")) 
+load(here::here("data/data_raw/PacFIN.RDBD.CompFT.14.Aug.2026.RData")) 
 
 #path for saving
 save_dir = here::here("data/data_processed/com_length_age_comps")
@@ -97,14 +97,22 @@ MID_length_comps_total_samples <- MID_length_comps_out$sexed
 
 raw_length_comps_total_samples <- rbind(TWL_length_comps_total_samples, NONTWL_length_comps_total_samples, MID_length_comps_total_samples)
 
+#also do input_n method stewart hamel
+
+
 #######################################################
-#then try get_pacfin_expansion function from PacFIN
+#get_pacfin_expansion function from PacFIN
 
-pacfintools::get_pacfin_expansions()
+load(here::here("data/data_processed/survey_length_weight/length_weight_parameters.rda"))
+
+expanded_comps <- pacfintools::get_pacfin_expansions(
+  Pdata = bds_cleaned,
+  Catch =  #have to process catch data
+)
 
 
 
-#try input_n method stewart hamel
+
 
 
 
