@@ -60,7 +60,7 @@ bds_cleaned <- bds_cleaned %>%
 ################ RAW LENGTH COMP 
 ###############################################################
 #TRAWL
-TWL_length_comps_total_samples <- get_raw_comps(data= bds_cleaned,
+TWL_length_comps_total_samples <- nwfscSurvey::get_raw_comps(data= bds_cleaned,
                                       fleet = "TWL",
                                       comp_bins = length_bins,
                                       comp_column_name = "lengthcm",
@@ -72,7 +72,7 @@ TWL_length_comps_total_samples <- get_raw_comps(data= bds_cleaned,
 TWL_length_comps_total_samples <- TWL_length_comps_out$sexed
 
 #NONTWL
-NONTWL_length_comps_total_samples <- get_raw_comps(data= bds_cleaned,
+NONTWL_length_comps_total_samples <- nwfscSurvey::get_raw_comps(data= bds_cleaned,
                                       fleet = "NONTWL",
                                       comp_bins = length_bins,
                                       comp_column_name = "lengthcm",
@@ -84,7 +84,7 @@ NONTWL_length_comps_total_samples <- get_raw_comps(data= bds_cleaned,
 NONTWL_length_comps_total_samples <- NONTWL_length_comps_out$sexed
 
 #MID
-MID_length_comps_total_samples <- get_raw_comps(data= bds_cleaned,
+MID_length_comps_total_samples <- nwfscSurvey::get_raw_comps(data= bds_cleaned,
                                          fleet = "MID",
                                          comp_bins = length_bins,
                                          comp_column_name = "lengthcm",
@@ -97,9 +97,14 @@ MID_length_comps_total_samples <- MID_length_comps_out$sexed
 
 raw_length_comps_total_samples <- rbind(TWL_length_comps_total_samples, NONTWL_length_comps_total_samples, MID_length_comps_total_samples)
 
+#######################################################
+#then try get_pacfin_expansion function from PacFIN
+
+pacfintools::get_pacfin_expansions()
 
 
 
+#try input_n method stewart hamel
 
 
 
