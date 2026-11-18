@@ -4,7 +4,7 @@ library(nwfscSurvey)
 library(r4ss)
 
 load(here::here("data/data_raw/PacFIN.RDBD.bds.14.Aug.2026.RData")) 
-load(here::here("data/data_raw/PacFIN.RDBD.CompFT.14.Aug.2026.RData")) 
+#load(here::here("data/data_raw/PacFIN.RDBD.CompFT.14.Aug.2026.RData")) 
 
 #path for saving
 save_dir = here::here("data/data_processed/com_length_age_comps")
