@@ -31,18 +31,6 @@ bds_cleaned <- pacfintools::cleanPacFIN(
   )#|>
   #mutate(geargroup = ifelse(geargroup!='TWL','NONTWL',geargroup)) 
 
-## make the same but keeping al the records so I can see what was removed
-bds_cleaned_full <- pacfintools::cleanPacFIN(
-  Pdata = bds.pacfin,
-  keep_gears = used_gears,
-  keep_length_type = good_lengths,
-  keep_sample_type = good_samples,
-  keep_sample_method = good_methods,
-  keep_age_method = good_age_method,
-  clean = FALSE
-)
-
-
 #remove NET, TLS, and TWS
 bds_cleaned <- bds_cleaned %>%
   dplyr::filter(geargroup != "NET") %>%
@@ -51,10 +39,10 @@ bds_cleaned <- bds_cleaned %>%
   mutate(fleet=replace_when(fleet, geargroup=="HKL" ~ "NONTWL"))%>%
   mutate(fleet=replace_when(fleet, geargroup=="POT" ~ "NONTWL"))
 
-
 #add sex column
 bds_cleaned <- bds_cleaned %>%
-  dplyr::mutate(sex = SEX_CODE)
+#  dplyr::mutate(sex = SEX_CODE)%>%
+  dplyr::mutate(stratification = fleet)
 
 ##############################################################
 ################ RAW LENGTH COMP 
@@ -103,11 +91,23 @@ raw_length_comps_total_samples <- rbind(TWL_length_comps_total_samples, NONTWL_l
 #######################################################
 #get_pacfin_expansion function from PacFIN
 
-load(here::here("data/data_processed/survey_length_weight/length_weight_parameters.rda"))
+load(here::here("data/data_processed/survey_length_weight/length_weight_parameters.rda"))#should this always be the parameters form the survey? or could it be ODFW parameters?
+load(here::here("data/data_processed/com_length_age_comps/pacfin_catch_aggregated.rda"))
+
+formatted_pacfin_catch <- pacfin_catch |>
+  pacfintools::formatCatch(
+    strat = c("fleet"),
+    valuename = "landings_mt")
+    
+#remove earliest years of pacfin bds because not available in catch data - look into this - why
+bds_cleaned <- bds_cleaned %>%
+  dplyr::filter(year > 1980)
 
 expanded_comps <- pacfintools::get_pacfin_expansions(
   Pdata = bds_cleaned,
-  Catch =  #have to process catch data
+  Catch =  formatted_pacfin_catch,
+  weight_length_estimates = pars,
+  verbose = TRUE
 )
 
 

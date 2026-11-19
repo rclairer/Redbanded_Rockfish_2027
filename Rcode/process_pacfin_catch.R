@@ -26,7 +26,11 @@ pacfin_catch <- catch.pacfin |>
   dplyr::filter(PACFIN_GROUP_GEAR_CODE != "TLS") %>%
   dplyr::filter(PACFIN_GROUP_GEAR_CODE != "TWS") %>%
   dplyr::mutate(
-    fleet=case_when(PACFIN_GROUP_GEAR_CODE=="TWL"~'TWL',
+    PACFIN_GROUP_GEAR_CODE=replace_when(PACFIN_GROUP_GEAR_CODE, PACFIN_GEAR_CODE=="MDT"~"MID")
+  )|>
+  dplyr::mutate(
+    fleet=case_when(PACFIN_GROUP_GEAR_CODE=="MID"~"MID",
+                    PACFIN_GROUP_GEAR_CODE=="TWL"~'TWL',
                     PACFIN_GROUP_GEAR_CODE=="HKL"~'NONTWL',
                     PACFIN_GROUP_GEAR_CODE=="POT"~"NONTWL"
   ))|>
@@ -35,11 +39,11 @@ dplyr::mutate(
     AGENCY_CODE == "C" ~ "CA",
     AGENCY_CODE == "O" ~ "OR",
     .default = "WA"
- ) )|>
+ ) ) |>
   dplyr::summarize(
     .by = c(Year, fleet),
     source = "pacfin",
     landings_mt = sum(ROUND_WEIGHT_MTONS)
   )
-
-save(pacfin_catch, file = here::here("data/data_processed/com_length_age_comps/pacfin_catch.rda"))
+    
+save(pacfin_catch, file = here::here("data/data_processed/com_length_age_comps/pacfin_catch_aggregated.rda"))
