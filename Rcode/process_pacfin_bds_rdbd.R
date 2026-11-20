@@ -44,51 +44,7 @@ bds_cleaned <- bds_cleaned %>%
 #  dplyr::mutate(sex = SEX_CODE)%>%
   dplyr::mutate(stratification = fleet)
 
-##############################################################
-################ RAW LENGTH COMP 
-###############################################################
-#TRAWL
-TWL_length_comps_total_samples <- nwfscSurvey::get_raw_comps(data= bds_cleaned,
-                                      fleet = "TWL",
-                                      comp_bins = length_bins,
-                                      comp_column_name = "lengthcm",
-                                      dir = NULL,
-                                      input_n_method="total_samples",
-                                      two_sex_comps = TRUE,
-                                      month = 7)
-
-TWL_length_comps_total_samples <- TWL_length_comps_out$sexed
-
-#NONTWL
-NONTWL_length_comps_total_samples <- nwfscSurvey::get_raw_comps(data= bds_cleaned,
-                                      fleet = "NONTWL",
-                                      comp_bins = length_bins,
-                                      comp_column_name = "lengthcm",
-                                      dir = NULL,
-                                      input_n_method="total_samples",
-                                      two_sex_comps = TRUE,
-                                      month = 7)
-
-NONTWL_length_comps_total_samples <- NONTWL_length_comps_out$sexed
-
-#MID
-MID_length_comps_total_samples <- nwfscSurvey::get_raw_comps(data= bds_cleaned,
-                                         fleet = "MID",
-                                         comp_bins = length_bins,
-                                         comp_column_name = "lengthcm",
-                                         dir = NULL,
-                                         input_n_method="total_samples",
-                                         two_sex_comps = TRUE,
-                                         month = 7)
-
-MID_length_comps_total_samples <- MID_length_comps_out$sexed
-
-raw_length_comps_total_samples <- rbind(TWL_length_comps_total_samples, NONTWL_length_comps_total_samples, MID_length_comps_total_samples)
-
-#also do input_n method stewart hamel
-
-
-#######################################################
+#################################################################################
 #get_pacfin_expansion function from PacFIN
 
 load(here::here("data/data_processed/survey_length_weight/length_weight_parameters.rda"))#should this always be the parameters form the survey? or could it be ODFW parameters?
@@ -103,6 +59,7 @@ formatted_pacfin_catch <- pacfin_catch |>
 bds_cleaned <- bds_cleaned %>%
   dplyr::filter(year > 1980)
 
+#1st and 2nd stage expansion combined
 expanded_comps <- pacfintools::get_pacfin_expansions(
   Pdata = bds_cleaned,
   Catch =  formatted_pacfin_catch,
@@ -110,264 +67,136 @@ expanded_comps <- pacfintools::get_pacfin_expansions(
   verbose = TRUE
 )
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-################################################
-
-nrow(bds.pacfin);nrow(bds_cleaned)
-ncol(bds.pacfin);ncol(bds_cleaned)
-names(bds_cleaned)
-
-bds_cleaned %>% 
-  group_by(geargroup) %>% 
-  summarise(n=length(geargroup))
-
-bds_cleaned %>% 
-  group_by(fleet) %>% 
-  summarise(n=length(fleet))
-#geargroup and fleet are the same
-
-bds_cleaned %>% 
-  group_by(geargroup,PACFIN_GEAR_NAME) %>% 
-  summarise(n=length(PACFIN_GEAR_NAME))
-
-#plot gear along time
-bds_cleaned %>%
-  filter(geargroup=='TWL') %>% 
-  group_by(year,geargroup,PACFIN_GEAR_NAME) %>% 
-  summarise(n=length(SAMPLE_NUMBER)) %>% 
-  ggplot()+geom_bar(aes(year,n,fill=PACFIN_GEAR_NAME),position='stack',stat='identity')
-
-bds_cleaned %>%
-  filter(!geargroup=='TWL') %>% 
-  group_by(year,geargroup,PACFIN_GEAR_NAME) %>% 
-  summarise(n=length(SAMPLE_NUMBER)) %>% 
-  ggplot()+geom_bar(aes(year,n,fill=PACFIN_GEAR_NAME),position='stack',stat='identity')
-
-bds_cleaned %>%
-  group_by(year,PACFIN_GEAR_NAME) %>% 
-  filter(PACFIN_GEAR_NAME%in%c('TRAWLS')) %>% 
-  summarise(n=length(SAMPLE_NUMBER))
-
-#HAVE TO CHOOSE FLEET STRUCTURE
-bds_cleaned %>% pull(FTID) %>% unique() %>% length()
-
-bds_cleaned %>% pull(FTID) %>% is.na() %>% sum()
-
-bds_cleaned %>% pull(SAMPLE_NUMBER) %>% unique() %>% length()
-nrow(bds_cleaned)
-
-bds_cleaned %>% 
-  group_by(fleet) %>% 
-  summarize(FTID_NA=sum(is.na(FTID)),FTID_nNA=sum(!is.na(FTID)),
-            FTID_tot=length(FTID)) %>% 
-  mutate(verif=FTID_NA+FTID_nNA)
-
-bds_cleaned %>%
-  group_by(year,fleet) %>%
-  filter(!is.na(FTID)) %>% 
-  filter(!is.na(length)) %>% 
-  summarise(n_trips=length(unique(FTID)),n_fish=length(length)) 
-
-# df n_fish + n_trip long format
-bds_cleaned %>%
-  group_by(fleet,year) %>%
-  filter(!is.na(length)) %>% 
-  summarise(n_fish=length(length),
-            n_trips=length(unique(SAMPLE_NUMBER)),
-            n_trips2=length(unique(FTID)),
-            n_trips3=length((FTID))) %>% 
-  mutate(diff=n_trips-n_trips2)
-
-# check 2 ways of counting trips -> they match
-bds_cleaned %>% 
-  group_by(fleet,year) %>%
-  filter(!is.na(FTID)) %>%
-  filter(!is.na(length)) %>% 
-  # first way of computing trips
-  distinct(FTID) %>% 
-  summarize(n_trips=length(FTID)) %>%
-  ## merge with a second one to compare
-  full_join(bds_cleaned %>% 
-              group_by(fleet,year) %>%
-              filter(!is.na(FTID)) %>%
-              filter(!is.na(length)) %>% 
-              summarize(n_trips2=length(unique(FTID))),
-            by=c('fleet','year')) %>% 
-  mutate(isequal=n_trips==n_trips2) %>% summary()
-
-bds_cleaned %>% 
-  filter(is.na(FTID),!is.na(Age)) %>% nrow()
-
-#visualizations
-plotCleaned(bds_cleaned,savedir = save_dir)
-
-
-#COMPUTE SAMPLING EFFORT
-
-#Need a number of trips and fish samples per year per fleet
-
-#a row = a fish
-#SAMPLE_NUMBER = sample number (sometime a tow sometime not)
-#FTID = a fish ticket = proxy of a trip
-
-#remove NET, TLS, and TWS
-bds_cleaned <- bds_cleaned %>%
-  dplyr::filter(geargroup != "NET") %>%
-  dplyr::filter(geargroup != "TLS") %>%
-  dplyr::filter(geargroup != "TWS") %>%
-  mutate(fleet=replace_when(fleet, geargroup=="HKL" ~ "NONTWL"))%>%
-  mutate(fleet=replace_when(fleet, geargroup=="POT" ~ "NONTWL"))
-
-fleets_names <- tibble(
-  fleet_name=c(levels(as.factor(bds_cleaned$fleet))),
-  fleet_number=c(3,2,1))
-
-#LENGTH SAMPLING EFFORT
-
-### Number of trip and sample
-
-#### Computation
-# df n_fish + n_trip 
-length_sample_effort <- bds_cleaned %>%
-  group_by(year,fleet) %>%
-  filter(!is.na(FTID)) %>% 
-  filter(!is.na(length)) %>% 
-  summarise(n_trips=length(unique(FTID)),n_fish=length(length)) 
-
-# df n_fish + n_trip large format
-length_sample_effort_wide <- length_sample_effort %>% 
-  pivot_wider(id_cols = year,names_from = c(fleet),
-              values_from = c(n_trips,n_fish),
-              names_glue="{fleet}_{.value}") %>% 
-  relocate(year,TWL_n_trips,TWL_n_fish,
-            TWL_n_trips, TWL_n_fish,
-           NONTWL_n_trips, NONTWL_n_fish,
-           MID_n_trips, MID_n_fish) #%>% 
-
-#write.csv(length_sample_effort_wide,row.names = FALSE,
-#          file =paste0(save_dir,"com_length_sampling_effort.csv"))
-
-minmaxy_l <- c(min(length_sample_effort$year),max(length_sample_effort$year))
-
-length_sample_effort_plt <- length_sample_effort_wide %>% 
-  tidyr::pivot_longer(cols=-year) %>% 
-  ggplot2::ggplot(aes(x="",y=-year))+ggplot2::geom_tile(aes(fill=value))+
-  #ggplot2::geom_text(aes(label=value))+
-  ggplot2::facet_wrap(~name,nrow=1)+
-  ggplot2::scale_fill_gradient2()+
-  ggplot2::scale_y_continuous(breaks=-seq(minmaxy_l[1],minmaxy_l[2],1))+
-  labs(x='fleet*(numbers of trips OR fish)',y='year',
-       title="Updated length sampling effort")+
-  theme(legend.position='bottom') 
-
-length_sample_effort_plt
-ggsave(length_sample_effort_plt,filename=
-         paste0(save_dir,"/com_length_sampling_effort.png"),
-       width=12,height = 8)
-
-##Age sampling effort
-
-### trips and samples 
-
-#### Computation
-
-# df n_fish + n_trip large format
-age_sample_effort <- bds_cleaned %>%
-  group_by(year,fleet) %>%
-  #filter(!is.na(FTID)) %>% #remove NA fish tickets
-  filter(!is.na(lengthcm)) %>%  #remove fish w no length, cause we need them to produce caal
-  filter(!is.na(Age)) %>%  #remove rows with no age samples
-  summarise(n_trips=length(unique(FTID)),n_fish=length(Age)) #compute 
-
-
-# df n_fish + n_trip large format
-age_sample_effort_wide <- age_sample_effort %>% 
-  pivot_wider(id_cols = year,names_from = c(fleet),
-              values_from = c(n_trips,n_fish),
-              names_glue="{fleet}_{.value}") %>% 
-  relocate(year,TWL_n_trips,TWL_n_fish,
-           HKL_n_trips, HKL_n_fish) #%>% 
-
-#write.csv(age_sample_effort_wide,row.names = FALSE,
-#          file = paste0(save_dir,"com_age_sampling_effort.csv"))
-
-minmaxy_age <- c(min(age_sample_effort$year),max(age_sample_effort$year))
-
-#plot these numbers
-age_sample_effort_plt <- age_sample_effort %>% 
-  pivot_longer(cols=c(n_trips,n_fish),
-               values_to = 'value',names_to = 'var') %>% 
-  mutate(name=paste0(fleet,'_',var)) %>% 
-  ggplot(aes(x="",y=-year))+geom_tile(aes(fill=value))+
-  geom_text(aes(label=value))+
-  facet_wrap(~name,nrow=1)+
-  scale_fill_gradient2()+
-  scale_y_continuous(breaks=-seq(minmaxy_age[1],minmaxy_age[2],1))+
-  labs(x='fleet*(numbers of trips OR fish)',y='year',
-       title="Updated age sampling effort")+
-  theme(legend.position='bottom') 
-
-age_sample_effort_plt
-
-ggsave(age_sample_effort_plt,filename=
-         paste0(save_dir,"/com_age_sampling_effort.png"),
-       width=8,height = 5)
-
-##########################################################
-
-tmp_length_comps_out <- get_raw_comps(data=bds_cleaned,
-                                      fleet = "TWL",
-                                      comp_bins = length_bins,
-                                      comp_column_name = "Length_cm",
-                                      dir = NULL,
-                                      input_n_method="total_samples",
-                                      two_sex_comps = TRUE)
-
-
-raw_length_comps <-NULL
-
-# looping over every fleet
-for (f in 1:nrow(fleets_names)){
-  tmp_dat <- bds_cleaned %>% filter(!is.na(lengthcm),fleet==as.character(fleets_names[f,1])) %>% 
-    mutate(common_name='redbanded rockfish',total_samples=1,project='A')
+#process data
+length_comps_long <- pacfintools::getComps(
+  Pdata = expanded_comps |>
+    dplyr::filter(!is.na(lengthcm)),
+  Comps = "LEN",
+  weightid = "Final_Sample_Size_L",
+  verbose = FALSE
+)
+
+data_commercial_lengths_expanded <- pacfintools::writeComps(
+  inComps = length_comps_long,
+  column_with_input_n = "n_stewart",
+  comp_bins = length_bins,
+  verbose = FALSE
+) |>
+  dplyr::arrange(fleet)
+
+utils::write.csv(
+  data_commercial_lengths_expanded,
+  file = here::here(
+    "data", "data_processed","com_length_age_comps",
+    paste0("data-commercial-comps-lengths-catch-expanded.csv")#because this is second stage expansion
+  ),
+  row.names = FALSE
+)
+
+length_trips_samples <- length_comps_long |>
+  dplyr::ungroup() |>
+  dplyr::summarise(
+    .by = c(fishyr, fleet),
+    trips = sum(unique(n_tows)),
+    samples = sum(unique(n_fish)),
+    input_n = sum(unique(n_stewart))
+  ) |>
+  dplyr::rename(year = fishyr)
+
+utils::write.csv(
+  length_trips_samples,
+  file = here::here(
+    "data", "data_processed","com_length_age_comps",
+    paste0("data-commercial-bds-n-length.csv")
+  ),
+  row.names = FALSE
+)
+
+
+#data plots
+
+# investigate sex ratios
+table(bds_cleaned$SAMPLE_YEAR, bds_cleaned$SEX_CODE)
+table(
+  bds_cleaned$SAMPLE_YEAR,
+  bds_cleaned$SEX_CODE,
+  bds_cleaned$fleet
+)
+
+# fraction of unsexed fish by year
+unsexed_fracs <- data.frame(
+  yr = unique(bds_cleaned$SAMPLE_YEAR),
+  unsexed_frac = NA
+)
+for (irow in 1:nrow(unsexed_fracs)) {
+  yr <- unsexed_fracs$yr[irow]
   
-  tmp_length_comps_out <- get_raw_comps(data=tmp_dat,
-                                        comp_bins = length_bins,
-                                        comp_column_name = "Length_cm",
-                                        dir = NULL,
-                                        input_n_method="total_samples", 
-                                        fleet = fleets_names[f,2],
-                                        two_sex_comps = TRUE)
-  
-  tmp_length_comps <- tmp_length_comps_out$unsexed 
-  tmp_length_comps <- 
-  #combine to make a df w all fleets
-  raw_length_comps <- raw_length_comps %>% bind_rows(tmp_length_comps)
+  sub <- bds_cleaned$SAMPLE_YEAR == yr
+  unsexed_fracs$unsexed_frac[irow] <- sum(
+    bds_cleaned[sub, "SEX_CODE"] == "U"
+  ) /
+    sum(bds_cleaned[sub, "SEX_CODE"] %in% c("F", "M", "U"))
+}
+unsexed_fracs$unsexed_frac <- round(unsexed_fracs$unsexed_frac, 2)
+
+test <- aggregate(
+  bds_cleaned$lengthcm,
+  by = list(
+    yr = bds_cleaned$SAMPLE_YEAR,
+    sex = bds_cleaned$SEX_CODE,
+    fleet = bds_cleaned$fleet
+  ),
+  FUN = mean,
+  na.rm = TRUE
+)
+plot(
+  0,
+  type = 'n',
+  xlim = c(1980, 2026),
+  ylim = c(0, 100),
+  xlab = "year",
+  ylab = "Mean length (cm)"
+)
+for (fleet in c("MID","NONTWL","TWL")) {
+  for (sex in c("F", "M", "U")) {
+    lines(
+      test[test$fleet == fleet & test$sex == sex, c("yr", "x")],
+      pch = sex
+    )
+  }
 }
 
-# raw_length_comps %>% summary()
+# Look at the data between lengths and lengths with ages
+#will have to add age later
+length_sampling <- 
+  bds_cleaned |>
+    dplyr::mutate(source = "length") |>
+    dplyr::select(year, geargroup, fleet, lengthcm, area, source)
+
+
+gg <- ggplot2::ggplot(
+  length_sampling,
+  ggplot2::aes(x = lengthcm, fill = source) #would add length-age source when we have age data
+) +
+  ggplot2::geom_density(alpha = 0.20) +
+  ggplot2::facet_grid(. ~ fleet) +
+  ggplot2::theme_bw() +
+#  ggplot2::theme(
+#    legend.background = element_rect(fill = alpha("white", 0.1)),
+#    text = ggplot2::element_text(size = 14),
+#    strip.background = ggplot2::element_rect(colour = "black", fill = "white"),
+#    legend.position = c(0.80, 0.85)
+#  ) +
+  ggplot2::xlab("Length (cm)") +
+  ggplot2::ylab("Density")
+
+
+ggplot2::ggsave(
+  plot = gg,
+  filename = here::here(
+    "data","data_processed","com_length_age_comps",
+    "PacFIN_length_sampling_byfleet.png"
+  ),
+  width = 10,
+  height = 8
+)
